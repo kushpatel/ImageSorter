@@ -87,7 +87,7 @@
 
         <form id="getData" action="response.jsp">
             Search for an object: 
-            <select>
+            <select name="search_by">
                 <option value="bibid">Orbis Bib ID</option>
                 <option value="objectid">TMS Object ID</option>
             </select>

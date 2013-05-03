@@ -12,8 +12,10 @@
         <title>jQuery UI Sortable - Display as grid</title>
     </head>
     <body>
-        <jsp:useBean id="mybean" scope="session" class="ycba.sorter.RecordObjHandler" />
-        <jsp:setProperty name="mybean" property="search_id" />
-        <h1>Hello, <jsp:getProperty name="mybean" property="search_id" />!</h1>
+        <jsp:useBean id="searchbean" scope="session" class="ycba.sorter.SearchQueryHandler" />
+        <jsp:setProperty name="searchbean" property="search_by" />
+        <jsp:setProperty name="searchbean" property="search_id" />
+        <h1>Search by <jsp:getProperty name="searchbean" property="search_by" /></h1>
+        <h1>Search id = <jsp:getProperty name="searchbean" property="search_id" /></h1>
     </body>
 </html>
