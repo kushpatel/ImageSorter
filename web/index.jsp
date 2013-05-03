@@ -26,7 +26,7 @@
                     {id:1, order:1, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/f415d546-7e60-4d04-ac33-8146e36bccd1/format/1",caption:"before treatment, recto, unframed, UV Fluorescence"},
                     {id:2, order:2, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/5845bd26-b5e9-4757-9e5c-a7391e4aa178/format/1",caption:"before treatment, raking light, recto, unframed"},
                     {id:3, order:3, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/4ae0ebe1-d9a0-45ac-aa66-b695360855e4/format/1",caption:"after treatment, cropped to image, recto, unframed"}
-            ]};
+                ]};
     
             $(function() {
                 $( "#sortable" ).sortable();
@@ -80,6 +80,18 @@
                 }
                 alert(temp);
             }
+            
+            function postJson()
+            {
+                $.ajax({
+                    url:    "response.jsp",
+                    type:   "post",
+                    data:   "sample data string",//JSON.stringify(recordsObj),
+                    success: function(){
+                        alert("JSON Posted");
+                    }
+                });
+            }
     
         </script>
     </head>
@@ -92,7 +104,7 @@
                 <option value="objectid">TMS Object ID</option>
             </select>
             # <input type="text" name="search_id"/>            
-          <input type="submit" value="Search"></input>
+            <input type="submit" value="Search"></input>
         </form>
 
         <form id="saveData" action="#">
@@ -103,7 +115,19 @@
                     {
                         $('#sortable').append('<hr/>');
                         $.each(recordsObj.recordsArr, function(i) {
-                            $('#sortable').append('<li class="ui-state-default"><div onClick="showData(\''+recordsObj.recordsArr[i].caption+'\');"><img alt="'+recordsObj.recordsArr[i].caption+'" src="'+recordsObj.recordsArr[i].thumb+'"></div><div><input id = "'+i+'" type="radio" name="primary" value="primary" onClick = setPrimary('+i+')>primary</div>CDS Level:<select id="cds_level'+i+'" onchange = setCDSLevel('+i+')><option value="11">11</option><option value="12">12</option></select></li>');
+                            $('#sortable').append('<li class="ui-state-default">'+
+                                '<div onClick="showData(\''+
+                                recordsObj.recordsArr[i].caption+
+                                '\');"><img alt="'+
+                                recordsObj.recordsArr[i].caption+
+                                '" src="'+recordsObj.recordsArr[i].thumb+
+                                '"></div><div><input id = "'+i+
+                                '" type="radio" name="primary" value="primary"'+
+                                'onClick = setPrimary('+i+')>primary</div>'+
+                                'CDS Level:<select id="cds_level'+i+
+                                '" onchange = setCDSLevel('+i+')>'+
+                                '<option value="11">11</option>'+
+                                '<option value="12">12</option></select></li>');
                         });
                     }
                     else
@@ -113,7 +137,7 @@
 
             <div style="clear: both; padding-top:20px;">
                 <hr/>
-                <input type="button" value="save"></input>
+                <input type="button" value="save" onClick="postJson()"></input>
             </div>
         </form>        
     </body>
