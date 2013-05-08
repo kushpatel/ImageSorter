@@ -92,12 +92,23 @@
                     }
                 });
             }
+            
+            window.onload = function(){
+                $.ajax({
+                    url : 'search.jsp',
+                    data : { search: 'test' },
+                    dataType: 'json',
+                    success : function(json) {
+                        alert(json.title);
+                    }
+                }); 
+            }
     
         </script>
     </head>
     <body>
 
-        <form id="getData" action="response.jsp">
+        <form id="getData" action="search.jsp">
             Search for an object: 
             <select name="search_by">
                 <option value="bibid">Orbis Bib ID</option>
