@@ -21,12 +21,7 @@
         </style>
         <script>
 
-            var recordsObj = {primaryIdx:0, recordsArr:[
-                    {id:0, order:0, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/51bdfd56-0077-463d-b2ab-fd175bbac5b0/format/1",caption:"before treatment, IR Peca 904, recto, unframed"},
-                    {id:1, order:1, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/f415d546-7e60-4d04-ac33-8146e36bccd1/format/1",caption:"before treatment, recto, unframed, UV Fluorescence"},
-                    {id:2, order:2, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/5845bd26-b5e9-4757-9e5c-a7391e4aa178/format/1",caption:"before treatment, raking light, recto, unframed"},
-                    {id:3, order:3, isPrimary:false, cdsLevel:11, thumb:"http://deliver.odai.yale.edu/content/id/4ae0ebe1-d9a0-45ac-aa66-b695360855e4/format/1",caption:"after treatment, cropped to image, recto, unframed"}
-                ]};
+            var recordsObj;
     
             $(function() {
                 $( "#sortable" ).sortable();
@@ -93,56 +88,93 @@
                 });
             }
             
-            window.onload = function(){
+            function getImagesJSON(){
                 $.ajax({
                     url : 'search.jsp',
-                    data : { search: 'test' },
+                    //data : { search: 'test' },
                     dataType: 'json',
                     success : function(json) {
-                        alert(json.title);
+                        recordsObj = json;
+                        if (recordsObj.recordsArr)
+                        {
+                            $('#sortable').empty();
+                            $('#sortable').append('<hr/>');
+                            $.each(recordsObj.recordsArr, function(i) {
+                                $('#sortable').append('<li class="ui-state-default">'+
+                                    '<div onClick="showData(\''+
+                                    recordsObj.recordsArr[i].caption+
+                                    '\');"><img alt="'+
+                                    recordsObj.recordsArr[i].caption+
+                                    '" src="'+recordsObj.recordsArr[i].thumb+
+                                    '"></div><div><input id = "'+i+
+                                    '" type="radio" name="primary" value="primary"'+
+                                    'onClick = setPrimary('+i+')>primary</div>'+
+                                    'CDS Level:<select id="cds_level'+i+
+                                    '" onchange = setCDSLevel('+i+')>'+
+                                    '<option value="11">11</option>'+
+                                    '<option value="12">12</option></select></li>');
+                            });
+                        }
+                        else
+                            $('#sortable').append("<p>No data in Media Manager for this object!</p>");
                     }
                 }); 
             }
+            
+            /* onload function executed when window is loaded for the first time */
+            /*window.onload = function(){
+                $.ajax({
+                    url : 'search.jsp',
+                    //data : { search: 'test' },
+                    dataType: 'json',
+                    success : function(json) {
+                        recordsObj = json;
+                        if (recordsObj.recordsArr)
+                        {
+                            $('#sortable').append('<hr/>');
+                            $.each(recordsObj.recordsArr, function(i) {
+                                $('#sortable').append('<li class="ui-state-default">'+
+                                    '<div onClick="showData(\''+
+                                    recordsObj.recordsArr[i].caption+
+                                    '\');"><img alt="'+
+                                    recordsObj.recordsArr[i].caption+
+                                    '" src="'+recordsObj.recordsArr[i].thumb+
+                                    '"></div><div><input id = "'+i+
+                                    '" type="radio" name="primary" value="primary"'+
+                                    'onClick = setPrimary('+i+')>primary</div>'+
+                                    'CDS Level:<select id="cds_level'+i+
+                                    '" onchange = setCDSLevel('+i+')>'+
+                                    '<option value="11">11</option>'+
+                                    '<option value="12">12</option></select></li>');
+                            });
+                        }
+                        else
+                            $('#sortable').append("<p>No data in Media Manager for this object!</p>");
+                    }
+                }); 
+            }*/
     
         </script>
     </head>
     <body>
 
-        <form id="getData" action="search.jsp">
+        <form id="getData" action="search.jsp" onsubmit="getImagesJSON()">
             Search for an object: 
             <select name="search_by">
                 <option value="bibid">Orbis Bib ID</option>
                 <option value="objectid">TMS Object ID</option>
             </select>
             # <input type="text" name="search_id"/>            
-            <input type="submit" value="Search"></input>
+           <input type="button" value="Search" onclick="getImagesJSON()"></input>
+           <!-- <input type="submit" value="Search"></input> -->
         </form>
 
         <form id="saveData" action="#">
 
             <ul id="sortable">
                 <script>
-                    if (recordsObj.recordsArr)
-                    {
-                        $('#sortable').append('<hr/>');
-                        $.each(recordsObj.recordsArr, function(i) {
-                            $('#sortable').append('<li class="ui-state-default">'+
-                                '<div onClick="showData(\''+
-                                recordsObj.recordsArr[i].caption+
-                                '\');"><img alt="'+
-                                recordsObj.recordsArr[i].caption+
-                                '" src="'+recordsObj.recordsArr[i].thumb+
-                                '"></div><div><input id = "'+i+
-                                '" type="radio" name="primary" value="primary"'+
-                                'onClick = setPrimary('+i+')>primary</div>'+
-                                'CDS Level:<select id="cds_level'+i+
-                                '" onchange = setCDSLevel('+i+')>'+
-                                '<option value="11">11</option>'+
-                                '<option value="12">12</option></select></li>');
-                        });
-                    }
-                    else
-                        $('#sortable').append("<p>No data in Media Manager for this object!</p>");
+                   // http://www.kirupa.com/forum/showthread.php?365795-ONCLICK-event-for-a-submit-button
+                    //getImagesJSON();
                 </script>
             </ul>
 
