@@ -89,6 +89,7 @@
             }
             
             function getImagesJSON(){
+                //document.forms["getData"].submit();
                 $.ajax({
                     url : 'search.jsp',
                     //data : { search: 'test' },
@@ -158,15 +159,15 @@
     </head>
     <body>
 
-        <form id="getData" action="search.jsp" onsubmit="getImagesJSON()">
+        <form id="getData" action="response.jsp">
             Search for an object: 
             <select name="search_by">
                 <option value="bibid">Orbis Bib ID</option>
                 <option value="objectid">TMS Object ID</option>
             </select>
             # <input type="text" name="search_id"/>            
-           <input type="button" value="Search" onclick="getImagesJSON()"></input>
-           <!-- <input type="submit" value="Search"></input> -->
+           <!-- <input type="button" value="Search" onclick="getImagesJSON()"></input> -->
+           <input type="submit" value="Search"></input>
         </form>
 
         <form id="saveData" action="#">
