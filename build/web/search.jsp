@@ -3,43 +3,157 @@
     Created on : May 8, 2013, 3:44:24 PM
     Author     : acdr4
 --%>
-<%@page contentType="text/html; charset=UTF-8"%>
-<%@page import="org.json.simple.JSONObject"%>
-<%@page import="org.json.simple.JSONArray"%>
-<%
-   /* JSONObject json1 = new JSONObject();
-    json1.put("title", "TITLE_TEST");
-    json1.put("link", "LINK_TEST");
-    out.print(json1);
-    out.flush();
-    */
 
-    String[] url = new String[4];
-    url[0] = "http://deliver.odai.yale.edu/content/id/51bdfd56-0077-463d-b2ab-fd175bbac5b0/format/1";
-    url[1] = "http://deliver.odai.yale.edu/content/id/f415d546-7e60-4d04-ac33-8146e36bccd1/format/1";
-    url[2] = "http://deliver.odai.yale.edu/content/id/5845bd26-b5e9-4757-9e5c-a7391e4aa178/format/1";
-    url[3] = "http://deliver.odai.yale.edu/content/id/4ae0ebe1-d9a0-45ac-aa66-b695360855e4/format/1";
-    String[] caption = new String[4];
-    caption[0] = "before treatment, IR Peca 904, recto, unframed";
-    caption[1] = "before treatment, recto, unframed, UV Fluorescence";
-    caption[2] = "before treatment, raking light, recto, unframed";
-    caption[3] = "after treatment, cropped to image, recto, unframed";
-    JSONArray data = new JSONArray();
-    for(int i = 0; i < 4; i++) {
-        JSONObject json = new JSONObject();
-        json.put("id",new Integer(i));
-        json.put("order",new Integer(i));
-        json.put("isPrimary",new Boolean(false));
-        json.put("cdsLevel",new Integer(11));
-        json.put("thumb",url[i]);
-        json.put("caption",caption[i]);
-        data.add(json);
-    }
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>jQuery UI Sortable - Display as grid</title>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.0/themes/base/jquery-ui.css" />
+        <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+        <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+        <style>
+            #sortable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+            #sortable li { margin: 3px 3px 3px 0; padding: 1px; float: left; width: 128px; height: 128px; font-weight: bold; font-size: 1em; text-align: left; }
+            #transbox { background-color:#ffffff; color:#000; width:20px; border:1px solid black; opacity:0.4; filter:alpha(opacity=40); } 
+            img {max-width:128px;max-height:128px;}
+        </style>
+
+        <!--create a useBean session that will fetch JSON for the searched object -->
+        <jsp:useBean id="searchbean" scope="session" class="ycba.sorter.SearchQueryHandler" />
+        <jsp:setProperty name="searchbean" property="search_by" />
+        <jsp:setProperty name="searchbean" property="search_id" />
+        <% String json = searchbean.getJSON();%>
+
+        <script>
+
+            var recordsObj;
     
-    JSONObject finalJson = new JSONObject();
-    finalJson.put("primaryIdx",new Integer(0));
-    finalJson.put("recordsArr",data);
+            $(function() {
+                $( "#sortable" ).sortable();
+                $( "#sortable" ).disableSelection();
+            });
     
-    out.print(finalJson);
-    out.flush();
-%>
+            function showData(caption) {
+                alert(caption);
+            }
+
+            function setPrimary(index)
+            {
+                recordsObj.recordsArr[recordsObj.primaryIdx].isPrimary = false;
+                recordsObj.recordsArr[index].isPrimary = true;
+                recordsObj.primaryIdx = index;
+                //is_primary[primary_idx] = false;
+                //is_primary[index] = true;
+                alert(index);
+            }
+
+            function setCDSLevel(index)
+            {
+                recordsObj.recordsArr[index].cdsLevel = $('#cds_level'+index+'').val();
+                displayRecordsObj("cdsLevel");
+                //cds_level[index] = $('#cds_level'+index+'').val();
+                //alert(cds_level);
+            }
+            
+            function displayRecordsObj(param)
+            {
+                var temp = [];
+                if(param == "id") {
+                    for(i = 0; i < 4; i++){
+                        temp.push(recordsObj.recordsArr[i].id);
+                    }
+                }
+                else if(param == "order"){
+                    for(i = 0; i < 4; i++){
+                        temp.push(recordsObj.recordsArr[i].order);
+                    }
+                }
+                else if(param == "isPrimary"){
+                    for(i = 0; i < 4; i++){
+                        temp.push(recordsObj.recordsArr[i].isPrimary);
+                    }
+                }
+                else if(param == "cdsLevel"){
+                    for(i = 0; i < 4; i++){
+                        temp.push(recordsObj.recordsArr[i].cdsLevel);
+                    }
+                }
+                alert(temp);
+            }
+            
+            function postJson()
+            {
+                $.ajax({
+                    url:    "save.jsp",
+                    type:   "post",
+                    data:   "sample data string",//JSON.stringify(recordsObj),
+                    success: function(){
+                        alert("JSON Posted");
+                    }
+                });
+            }
+            
+            function parseJson(json){
+                recordsObj = json;
+                if (recordsObj.recordsArr)
+                {
+                    $('#sortable').empty();
+                    $('#sortable').append('<hr/>');
+                    $.each(recordsObj.recordsArr, function(i) {
+                        $('#sortable').append('<li class="ui-state-default">'+
+                            '<div onClick="showData(\''+
+                            recordsObj.recordsArr[i].caption+
+                            '\');"><img alt="'+
+                            recordsObj.recordsArr[i].caption+
+                            '" src="'+recordsObj.recordsArr[i].thumb+
+                            '"></div><div><input id = "'+i+
+                            '" type="radio" name="primary" value="primary"'+
+                            'onClick = setPrimary('+i+')>primary</div>'+
+                            'CDS Level:<select id="cds_level'+i+
+                            '" onchange = setCDSLevel('+i+')>'+
+                            '<option value="11">11</option>'+
+                            '<option value="12">12</option></select></li>');
+                    });
+                }
+                else
+                    $('#sortable').append("<p>No data in Media Manager for this object!</p>");
+            }
+            
+    /* onload function executed when window is loaded for the first time */
+    /*window.onload = function(){*/
+
+        </script>
+    </head>
+    <body>
+        <p>Search by <jsp:getProperty name="searchbean" property="search_by" /></p>
+        <p>Search id = <jsp:getProperty name="searchbean" property="search_id" /></p>
+        <p>JSON Object = <jsp:getProperty name="searchbean" property="JSON" /></p>        
+
+        <form id="getData" action="search.jsp">
+            Search for an object: 
+            <select name="search_by">
+                <option value="bibid">Orbis Bib ID</option>
+                <option value="objectid">TMS Object ID</option>
+            </select>
+            # <input type="text" name="search_id"/>            
+            <!-- <input type="button" value="Search" onclick="getImagesJSON()"></input> -->
+            <input type="submit" value="Search"></input>
+        </form>
+
+        <form id="saveData" action="#">
+
+            <ul id="sortable"></ul>
+
+            <div style="clear: both; padding-top:20px;">
+                <hr/>
+                <input type="button" value="save" onClick="postJson()"></input>
+            </div>
+        </form>
+        <script>
+            parseJson(<%=json%>);
+        </script>
+    </body>
+</html>
